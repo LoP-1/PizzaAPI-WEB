@@ -7,11 +7,11 @@
     <link rel="stylesheet" href="styles/styles.css">
     
     <script>
-        // Verifica si el usuario está autenticado antes de cargar la página
+        // Verifica si el usuario está autenticado antes de pedir pizzas
         document.addEventListener("DOMContentLoaded", function () {
             const token = localStorage.getItem("token");
             if (!token) {
-                window.location.href = "index.html"; // Si no hay token, redirigir al login
+                window.location.href = "index.html"; 
             }
         });
 
@@ -20,9 +20,6 @@
 <body>
     <div class="container">
         <h1>Crea tu propia Pizza🍕</h1>
-
-        <!-- Botón de Logout -->
-        <button onclick="logout()" class="logout-button">Cerrar Sesión</button>
 
         <form id="pizza-form">
             <h3 class="statement">Seleccione el tamaño de la masa</h3>
@@ -49,7 +46,11 @@
             </label>
 
             <button class="send">Agregar al Carrito</button>
+            
         </form>
+
+    <button onclick="logout()" class="logout-button">Cerrar Sesión</button>
+    
     </div>
 
     <script src="scripts/request.js"></script>

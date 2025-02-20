@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Manejamos el tamaño de la pizza
+    //tamaño de la pizza
     const sizeRadios = document.querySelectorAll('input[name="size"]');
     sizeRadios.forEach(radio => {
         radio.addEventListener("change", () => {
@@ -11,20 +11,20 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // Manejamos los toppings y sus contadores
+//topings temporales
     const toppingCheckboxes = document.querySelectorAll(".topping");
     const counters = document.querySelectorAll(".counter");
 
     toppingCheckboxes.forEach(checkbox => {
         checkbox.addEventListener("change", function () {
             const counter = document.querySelector(`.counter[data-for="${this.dataset.id}"]`);
-            counter.disabled = !this.checked; // Activa o desactiva el contador
+            counter.disabled = !this.checked; 
         });
     });
 });
 
 async function logout() {
-    const token = localStorage.getItem("token"); // Obtener el token
+    const token = localStorage.getItem("token"); // Obtener el token guardado localmente
 
     if (!token) {
         window.location.href = "index.html"; // Si no hay token, redirigir directamente
@@ -50,7 +50,7 @@ async function logout() {
         console.error("Error en la solicitud de logout:", error);
     }
 
-    // Eliminar el token y redirigir al login
+    // Eliminar el token y redirigir al login logeo limpio
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
     window.location.href = "index.html";

@@ -1,59 +1,105 @@
-body{
-    background-color: #f8f8f8;
-    font-family: Arial, sans-serif;
-    margin: 0;
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap");
+
+:root {
+    --white-color: hsl(0,0%,100%);
+    --black-color: hsl(0, 0% , 0%);
+    --body-font:  "Poppins", sans-serif; 
+    --h1-font-size: 1.75rem;
+    --normal-font-size: 1rem;
+    --small-font-size: .813rem;
+    --font-medium: 500; 
+}
+
+* {
+    box-sizing: border-box;
     padding: 0;
-}
-
-.container{
-    margin-top: 5%;
-    position: absolute;
-    min-width: 400px;
-    max-width: 500px;
-    left: 30%;
-    right: 30%;
-    font-family: Arial, sans-serif;
-    background-color: antiquewhite;
-}
-
-
-h1{
-    text-align: center;
-    font-size: 2em;
     margin: 0;
-    padding: 10px;
-    background: #f1eca7;
-    border: 1px solid #ebf145;
-    margin-bottom: 20px;
+    background-color: black;
+    color: var(--white-color); 
 }
 
-form :not(.send){
+body {
+    font-family: var(--body-font);
+}
+
+.container {
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+h1 {
+    font-size: var(--h1-font-size);
+    margin-bottom: 1rem;
     text-align: center;
-    padding: 5px 5px 0px 25px;
-    text-align: left;
-    border: 0px 10px;
 }
 
-.statement{
-    margin-bottom: 10px;
-    text-align: left;
-    font-size: 1.5em;
+.logout-button {
+    margin-left: auto; 
+    margin-top: 2rem;
+    background-color: var(--white-color);
+    color: var(--black-color);
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: var(--font-medium);
+    cursor: pointer;
+    margin-bottom: 2rem; 
+}
+
+#pizza-form {
+    background-color: hsla(0, 0%, 10%, 0.5); 
+    border: 2px solid var(--white-color);
+    padding: 2rem;
+    border-radius: 1rem;
+    width: 90%; 
+    max-width: 500px; 
+}
+
+.statement {
+    font-size: var(--normal-font-size);
+    margin-bottom: 1rem;
 }
 
 label {
-    display: block;
-}
-.send {
-    display: block; 
-    margin: 20px auto;
-    padding: 10px 20px;
-    font-size: 1.2em;
-    background-color: #f1eca7;
-    border: 1px solid #ebf145;
-    border-radius: 5px;
-    cursor: pointer;
+    display: flex; 
+    align-items: center;
+    margin-bottom: 0.75rem;
 }
 
-.send:hover {
-    background-color: rgb(212, 169, 59);
+input[type="radio"],
+input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+.counter {
+    width: 40px;
+    padding: 0.5rem;
+    border: 1px solid var(--white-color);
+    background-color: rgba(255, 255, 255, 0.1); 
+    color: var(--white-color);
+    border-radius: 0.25rem;
+    margin-left: 0.5rem;
+}
+
+.send {
+    background-color: var(--white-color);
+    color: var(--black-color);
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: var(--font-medium);
+    cursor: pointer;
+    width: 100%; 
+    margin-top: 1rem;
+}
+
+
+@media (min-width: 768px) {
+    #pizza-form {
+        padding: 3rem;
+    }
 }
