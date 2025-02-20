@@ -1,0 +1,57 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizzería - Creador de Pedidos</title>
+    <link rel="stylesheet" href="styles/styles.css">
+    
+    <script>
+        // Verifica si el usuario está autenticado antes de cargar la página
+        document.addEventListener("DOMContentLoaded", function () {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                window.location.href = "index.html"; // Si no hay token, redirigir al login
+            }
+        });
+
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Crea tu propia Pizza🍕</h1>
+
+        <!-- Botón de Logout -->
+        <button onclick="logout()" class="logout-button">Cerrar Sesión</button>
+
+        <form id="pizza-form">
+            <h3 class="statement">Seleccione el tamaño de la masa</h3>
+            <label><input type="radio" name="size" value="small"> Small</label>
+            <label><input type="radio" name="size" value="medium"> Medium</label>
+            <label><input type="radio" name="size" value="large"> Large</label>
+
+            <h3 class="statement">Agregar toppings</h3>
+            <label>
+                <input type="checkbox" class="topping" data-id="pepperoni"> Pepperoni
+                <input type="number" class="counter" data-for="pepperoni" min="1" max="10" value="1" disabled>
+            </label>
+            <label>
+                <input type="checkbox" class="topping" data-id="jamon"> Jamón
+                <input type="number" class="counter" data-for="jamon" min="1" max="10" value="1" disabled>
+            </label>
+            <label>
+                <input type="checkbox" class="topping" data-id="champiñones"> Champiñones
+                <input type="number" class="counter" data-for="champiñones" min="1" max="10" value="1" disabled>
+            </label>
+            <label>
+                <input type="checkbox" class="topping" data-id="Piña"> Piña
+                <input type="number" class="counter" data-for="Piña" min="1" max="10" value="1" disabled>
+            </label>
+
+            <button class="send">Agregar al Carrito</button>
+        </form>
+    </div>
+
+    <script src="scripts/request.js"></script>
+</body>
+</html>
