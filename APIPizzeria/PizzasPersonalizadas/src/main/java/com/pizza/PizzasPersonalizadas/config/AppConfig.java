@@ -1,34 +1,108 @@
 package com.pizza.PizzasPersonalizadas.config;
 
+import com.pizza.PizzasPersonalizadas.model.Token;
+import com.pizza.PizzasPersonalizadas.model.UserModel;
+import com.pizza.PizzasPersonalizadas.repository.TokenRepository;
+import com.pizza.PizzasPersonalizadas.repository.UserRepository;
+import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+
 
 @Configuration
 @RequiredArgsConstructor
 public class AppConfig {
 
+    private final UserRepository repository;
+    private final TokenRepository tokenRepository;
+
+    //permitir accesos
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider authenticationProvider, JwtAuthFilter jwtAuthFilter) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/register", "/auth/login").permitAll() // Permitir estos endpoints sin autenticación
-                        .anyRequest().authenticated() // Todo lo demás requiere autenticación
+                        .requestMatchers("/auth/**").permitAll()
+                        .anyRequest().authenticated()
                 )
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(logout -> logout
+                        .logoutUrl("/auth/logout")
+                        .addLogoutHandler((request, response, authentication) -> {
+                            final var autHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+                            logout(autHeader);
+                        })
+                        .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
+                );
 
         return http.build();
     }
+
+    private void logout(String token) {
+        if(token == null || token.startsWith("Bearer ")){
+            throw new IllegalArgumentException("Token Invalido");
+        }
+        final String jwtToken = token.substring(7);
+        final Token foundToken = tokenRepository.findByToken(jwtToken)
+                .orElseThrow(() -> new IllegalArgumentException("Token Invalido"));
+        foundToken.setExpired(true);
+        foundToken.setRevoked(true);
+        deleteExpiredTokens();
+        tokenRepository.save(foundToken);
+    }
+
+
+    @Modifying
+    @Query("DELETE FROM Token t WHERE t.expired = true OR t.revoked = true")
+    void deleteExpiredTokens(){
+    };
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return username -> {
+            final UserModel user = repository.findByUsername(username) // <-- Usa username
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            return org.springframework.security.core.userdetails.User.builder()
+                    .username(user.getUsername())
+                    .password(user.getPassword())
+                    .build();
+        };
+    }
+
+
 
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService());
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
 
 }

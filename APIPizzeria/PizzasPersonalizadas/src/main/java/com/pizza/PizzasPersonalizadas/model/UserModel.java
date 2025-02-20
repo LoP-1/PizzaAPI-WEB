@@ -1,5 +1,6 @@
 package com.pizza.PizzasPersonalizadas.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
@@ -17,13 +18,14 @@ public class UserModel{
     private Long id;
 
     private String email;
-    private String username;
-
 
     @Column(unique = true)
+    private String username;
+
     private String password;
 
     @OneToMany(mappedBy = "userModel",fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Token> tokens;
 
 }

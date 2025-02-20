@@ -1,6 +1,7 @@
 package com.pizza.PizzasPersonalizadas.service;
 
 import com.pizza.PizzasPersonalizadas.model.UserModel;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -34,8 +35,8 @@ public class JwtService {
     private String buildToken(final UserModel user, final long expiration) {
         return Jwts.builder()
                 .id(user.getId().toString())
-                .claims(Map.of("name",user.getUsername()))
-                .subject(user.getEmail())
+                .claims(Map.of("email", user.getEmail()))
+                .subject(user.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getKey())
@@ -47,4 +48,38 @@ public class JwtService {
     return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    public String extractUsername(final String token){
+        final Claims jwtToken = Jwts.parser()
+                .verifyWith(getSignInKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return jwtToken.getSubject();
+    }
+
+    private SecretKey getSignInKey() {
+        byte[] keyByte = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyByte);
+    }
+
+    public boolean isTokenValid(final String token, final UserModel user) {
+        final String username = extractUsername(token);
+        System.out.println("Extracted Username: " + username);
+        System.out.println("Expected Username: " + user.getUsername());
+        System.out.println("Token Expired: " + isTokenExpired(token));
+        return (username.equals(user.getUsername()) && !isTokenExpired(token));
+    }
+
+    private boolean isTokenExpired(final String token) {
+    return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token) {
+        final Claims jwtToken = Jwts.parser()
+                .verifyWith(getSignInKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return jwtToken.getExpiration();
+    }
 }
