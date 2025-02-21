@@ -15,6 +15,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         const data = await response.json();
 
         if (response.ok) {
+            localStorage.setItem("username", username);
             localStorage.setItem("token", data.access_token);
             localStorage.setItem("refreshToken", data.refresh_token);
             console.log('Token guardado:', data.access_token);
